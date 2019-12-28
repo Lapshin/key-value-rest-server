@@ -1,0 +1,11 @@
+#!/bin/sh
+FILENAME=/var/run/tarantool/tarantool.log
+PIDFILE=/var/run/tarantool/tarantool.pid
+FILESIZE=$(stat -c%s "$FILENAME")
+MAX_SIZE=52428800 #50Mb
+
+
+if [ $FILESIZE -gt $MAX_SIZE ];then
+    mv ${FILENAME} ${FILENAME}.bck
+    kill -SIGHUP `cat "$PIDFILE"`
+fi

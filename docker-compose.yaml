@@ -1,0 +1,25 @@
+version: '2'
+services:
+  tarantool:
+    image: tarantool/tarantool
+    volumes:
+      - ./log/tarantool/:/var/run/tarantool/
+      - ./app/:/opt/tarantool/
+      - ./logrotate/tarantool/:/etc/periodic/15min/
+    command: |
+      /bin/sh -c "crond && tarantool /opt/tarantool/app.lua"
+    ports:
+      - "127.0.0.1:3301:3301"
+  nginx:
+    image: tarantool/tarantool-nginx
+    depends_on:
+      - tarantool
+    volumes:
+      - ./log/nginx/:/var/log/nginx/
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/lua-tnt-proxy.conf:/etc/nginx/lua-tnt-proxy.conf
+      - ./logrotate/nginx:/etc/periodic/15min/
+    ports:
+      - "80:80"
+    command: |
+      /bin/sh -c "crond && nginx -g \"daemon off;\""

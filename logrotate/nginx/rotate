@@ -1,0 +1,11 @@
+#!/bin/sh
+FILENAME=/var/log/nginx/error.log
+PIDFILE=/var/run/nginx.pid
+FILESIZE=$(stat -c%s "$FILENAME")
+MAX_SIZE=5242880 #5Mb
+
+
+if [ $FILESIZE -gt $MAX_SIZE ];then
+    mv ${FILENAME} ${FILENAME}.bck
+    kill -SIGUSR1 `cat "$PIDFILE"`
+fi
